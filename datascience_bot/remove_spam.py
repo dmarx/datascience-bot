@@ -30,7 +30,11 @@ PORN_URLS = [
     "extremetube.com",
     "hardsextube.com",
 ]
-BLACKLISTED_URLS = VIDEO_URLS + BLOG_URLS + PORN_URLS
+MISC_SPAM_URLS = [
+    "actionableinsights.org" # Rehosts content without crediting source
+]
+
+BLACKLISTED_URLS = VIDEO_URLS + BLOG_URLS + PORN_URLS + MISC_SPAM_URLS
 
 
 def remove_spam_submission(submission: praw.models.reddit.submission) -> bool:
@@ -83,6 +87,10 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> bool:
         )
         comment = submission.reply(text)
         comment.mod.distinguish(how="yes", sticky=True)
+        return True
+    
+    # Remove "misc spam" without comment
+    elif any(url in submission.url for url in MISC_SPAM_URLS):
         return True
 
     else:
